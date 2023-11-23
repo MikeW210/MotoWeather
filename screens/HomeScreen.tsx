@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Text,
   View,
@@ -8,7 +8,8 @@ import {
 } from "react-native";
 import { Button } from 'react-native-ui-lib';
 import { AlarmCard } from '../components/AlarmCard';
-
+import BottomSheet from '@gorhom/bottom-sheet';
+import Feather from "react-native-vector-icons/Ionicons";
 
 
 const HomeScreen = ({navigation}) => {
@@ -35,13 +36,16 @@ const HomeScreen = ({navigation}) => {
       time: "10:00",
     },
   ]);
-  function addNewAlarm() {
-    const newAlarm = {
-      id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-      title: "Second Item",
-      time: "9  :00",
-    };
-    setData([...data, newAlarm])
+
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  const snapPoints: string[] | [] = useMemo(() => ["10%", "50%"], []);
+
+  const handleSheetChanges = useCallback((index: number) => {
+      console.log("handleSheetChanges", index);
+    }, []);
+  function openAlarmSheet() {
+    bottomSheetRef.current.snapToPosition("50%")
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -62,9 +66,22 @@ const HomeScreen = ({navigation}) => {
         <Button
           style={styles.addAlarmButton}
           label="+"
-          onPress={() => addNewAlarm()}
+          onPress={() => openAlarmSheet()}
         ></Button>
       </View>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={1}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+        enablePanDownToClose={true}
+      >
+        <Feather
+          name="file-text"
+          size={30}
+          color="#4F8EF7"
+        />
+      </BottomSheet>
     </SafeAreaView>
   );
 };
